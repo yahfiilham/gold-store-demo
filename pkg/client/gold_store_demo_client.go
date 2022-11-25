@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/strfmt"
 
 	"github.com/yahfiilham/gold-store-demo/pkg/client/health_check"
+	"github.com/yahfiilham/gold-store-demo/pkg/client/price"
 )
 
 // Default gold store demo HTTP client.
@@ -22,7 +23,7 @@ const (
 	DefaultHost string = "localhost:8080"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
-	DefaultBasePath string = "/api"
+	DefaultBasePath string = "/"
 )
 
 // DefaultSchemes are the default schemes found in Meta (info) section of spec file
@@ -56,6 +57,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *GoldStoreD
 	cli := new(GoldStoreDemo)
 	cli.Transport = transport
 	cli.HealthCheck = health_check.New(transport, formats)
+	cli.Price = price.New(transport, formats)
 	return cli
 }
 
@@ -102,6 +104,8 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 type GoldStoreDemo struct {
 	HealthCheck health_check.ClientService
 
+	Price price.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -109,4 +113,5 @@ type GoldStoreDemo struct {
 func (c *GoldStoreDemo) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.HealthCheck.SetTransport(transport)
+	c.Price.SetTransport(transport)
 }

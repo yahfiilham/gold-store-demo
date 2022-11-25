@@ -10,8 +10,11 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"github.com/yahfiilham/gold-store-demo/configs"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/health_check"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/price"
+	"github.com/yahfiilham/gold-store-demo/internal/handlers"
 	"github.com/yahfiilham/gold-store-demo/pkg/models"
 )
 
@@ -45,11 +48,44 @@ func configureAPI(api *operations.GoldStoreDemoAPI) http.Handler {
 		})
 	}
 
+	cfg := configs.NewConfig()
+
+	// health check
 	api.HealthCheckGetHealthCheckHandler = health_check.GetHealthCheckHandlerFunc(func(ghcp health_check.GetHealthCheckParams) middleware.Responder {
-		msg := "server is running"
 		return health_check.NewGetHealthCheckOK().WithPayload(&models.BaseResponse{
 			Code:    http.StatusOK,
-			Message: &msg,
+			Message: "server is running",
+		})
+	})
+
+	// price
+	api.PriceSavePriceHandler = price.SavePriceHandlerFunc(func(spp price.SavePriceParams) middleware.Responder {
+		data, err := handlers.SavePrice(cfg, spp.Data)
+		if err != nil {
+			return price.NewSavePriceDefault(http.StatusInternalServerError).WithPayload(
+				&models.BaseResponse{
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+		}
+
+		return price.NewSavePriceCreated().WithPayload(&price.SavePriceCreatedBody{
+			Data: data,
+		})
+	})
+
+	api.PriceGetPriceHandler = price.GetPriceHandlerFunc(func(spp price.GetPriceParams) middleware.Responder {
+		data, err := handlers.GetPrice(cfg)
+		if err != nil {
+			return price.NewGetPriceDefault(http.StatusInternalServerError).WithPayload(
+				&models.BaseResponse{
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+		}
+
+		return price.NewGetPriceOK().WithPayload(&price.GetPriceOKBody{
+			Data: data,
 		})
 	})
 

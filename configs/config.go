@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/yahfiilham/gold-store-demo/pkg/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -44,6 +45,11 @@ func NewConfig() *Config {
 		log.Fatal(err)
 	}
 	log.Print("success connect to database")
+
+	// migrate table
+	db.AutoMigrate(
+		&models.Price{},
+	)
 
 	app := &Config{
 		DB: db,

@@ -6,7 +6,7 @@
 //  Schemes:
 //    http
 //  Host: localhost:8080
-//  BasePath: /api
+//  BasePath: /
 //  Version: 1.0.0
 //  License: Apache 2.0 https://www.apache.org/licenses/LICENSE-2.0
 //  Contact: gold store maintainers<gold.store@email.com> http://localhost:8081/docs

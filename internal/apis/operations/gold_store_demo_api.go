@@ -20,6 +20,7 @@ import (
 	"github.com/go-openapi/swag"
 
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/health_check"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/price"
 )
 
 // NewGoldStoreDemoAPI creates a new GoldStoreDemo instance
@@ -44,6 +45,12 @@ func NewGoldStoreDemoAPI(spec *loads.Document) *GoldStoreDemoAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		PriceGetPriceHandler: price.GetPriceHandlerFunc(func(params price.GetPriceParams) middleware.Responder {
+			return middleware.NotImplemented("operation price.GetPrice has not yet been implemented")
+		}),
+		PriceSavePriceHandler: price.SavePriceHandlerFunc(func(params price.SavePriceParams) middleware.Responder {
+			return middleware.NotImplemented("operation price.SavePrice has not yet been implemented")
+		}),
 		HealthCheckGetHealthCheckHandler: health_check.GetHealthCheckHandlerFunc(func(params health_check.GetHealthCheckParams) middleware.Responder {
 			return middleware.NotImplemented("operation health_check.GetHealthCheck has not yet been implemented")
 		}),
@@ -83,6 +90,10 @@ type GoldStoreDemoAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// PriceGetPriceHandler sets the operation handler for the get price operation
+	PriceGetPriceHandler price.GetPriceHandler
+	// PriceSavePriceHandler sets the operation handler for the save price operation
+	PriceSavePriceHandler price.SavePriceHandler
 	// HealthCheckGetHealthCheckHandler sets the operation handler for the get health check operation
 	HealthCheckGetHealthCheckHandler health_check.GetHealthCheckHandler
 
@@ -162,6 +173,12 @@ func (o *GoldStoreDemoAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.PriceGetPriceHandler == nil {
+		unregistered = append(unregistered, "price.GetPriceHandler")
+	}
+	if o.PriceSavePriceHandler == nil {
+		unregistered = append(unregistered, "price.SavePriceHandler")
+	}
 	if o.HealthCheckGetHealthCheckHandler == nil {
 		unregistered = append(unregistered, "health_check.GetHealthCheckHandler")
 	}
@@ -253,6 +270,14 @@ func (o *GoldStoreDemoAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/price"] = price.NewGetPrice(o.context, o.PriceGetPriceHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/price"] = price.NewSavePrice(o.context, o.PriceSavePriceHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

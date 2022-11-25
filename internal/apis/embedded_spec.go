@@ -43,7 +43,6 @@ func init() {
     "version": "1.0.0"
   },
   "host": "localhost:8080",
-  "basePath": "/api",
   "paths": {
     "/health": {
       "get": {
@@ -67,14 +66,77 @@ func init() {
           }
         }
       }
+    },
+    "/price": {
+      "get": {
+        "description": "api for get current price",
+        "tags": [
+          "price"
+        ],
+        "summary": "get price",
+        "operationId": "GetPrice",
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/definitions/price"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "error",
+            "schema": {
+              "$ref": "#/definitions/baseResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "api for input price",
+        "tags": [
+          "price"
+        ],
+        "summary": "input price",
+        "operationId": "SavePrice",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/priceData"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/definitions/price"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "error",
+            "schema": {
+              "$ref": "#/definitions/baseResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
     "baseResponse": {
       "type": "object",
-      "required": [
-        "message"
-      ],
       "properties": {
         "code": {
           "type": "integer",
@@ -82,6 +144,57 @@ func init() {
         },
         "message": {
           "type": "string"
+        }
+      }
+    },
+    "modelID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-custom-tag": "gorm:\"type:int primary key auto_increment\""
+        }
+      }
+    },
+    "modelLogTime": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"type:int;autoCreateTime\""
+        },
+        "updatedAt": {
+          "type": "integer",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"type:int;autoUpdateTime\""
+        }
+      }
+    },
+    "price": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/modelID"
+        },
+        {
+          "$ref": "#/definitions/modelLogTime"
+        },
+        {
+          "$ref": "#/definitions/priceData"
+        }
+      ]
+    },
+    "priceData": {
+      "type": "object",
+      "properties": {
+        "buybackPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "topupPrice": {
+          "type": "number",
+          "format": "double"
         }
       }
     }
@@ -163,7 +276,6 @@ func init() {
     "version": "1.0.0"
   },
   "host": "localhost:8080",
-  "basePath": "/api",
   "paths": {
     "/health": {
       "get": {
@@ -187,14 +299,77 @@ func init() {
           }
         }
       }
+    },
+    "/price": {
+      "get": {
+        "description": "api for get current price",
+        "tags": [
+          "price"
+        ],
+        "summary": "get price",
+        "operationId": "GetPrice",
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/definitions/price"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "error",
+            "schema": {
+              "$ref": "#/definitions/baseResponse"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "api for input price",
+        "tags": [
+          "price"
+        ],
+        "summary": "input price",
+        "operationId": "SavePrice",
+        "parameters": [
+          {
+            "name": "data",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/priceData"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "$ref": "#/definitions/price"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "error",
+            "schema": {
+              "$ref": "#/definitions/baseResponse"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
     "baseResponse": {
       "type": "object",
-      "required": [
-        "message"
-      ],
       "properties": {
         "code": {
           "type": "integer",
@@ -202,6 +377,57 @@ func init() {
         },
         "message": {
           "type": "string"
+        }
+      }
+    },
+    "modelID": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "x-go-custom-tag": "gorm:\"type:int primary key auto_increment\""
+        }
+      }
+    },
+    "modelLogTime": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "integer",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"type:int;autoCreateTime\""
+        },
+        "updatedAt": {
+          "type": "integer",
+          "format": "date-time",
+          "x-go-custom-tag": "gorm:\"type:int;autoUpdateTime\""
+        }
+      }
+    },
+    "price": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/modelID"
+        },
+        {
+          "$ref": "#/definitions/modelLogTime"
+        },
+        {
+          "$ref": "#/definitions/priceData"
+        }
+      ]
+    },
+    "priceData": {
+      "type": "object",
+      "properties": {
+        "buybackPrice": {
+          "type": "number",
+          "format": "double"
+        },
+        "topupPrice": {
+          "type": "number",
+          "format": "double"
         }
       }
     }
