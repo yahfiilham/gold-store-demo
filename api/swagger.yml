@@ -1,0 +1,175 @@
+swagger: "2.0"
+basePath: /api
+host: localhost:8080
+info:
+  version: 1.0.0
+  title: Gold Store Demo
+  description: This is a simple gold store API.
+  license:
+    name: "Apache 2.0"
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  contact:
+    name: gold store maintainers
+    email: gold.store@email.com
+    url: http://localhost:8081/docs
+# securityDefinitions:
+#   key:
+#     type: apiKey
+#     in: header
+#     name: x-goldstore-token
+# security:
+#   - key: []
+produces:
+  - application/json
+consumes:
+  - application/json
+schemes:
+  - http
+paths:
+  /health:
+    get:
+      tags:
+        - health check
+      summary: check server
+      operationId: getHealthCheck
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: "#/definitions/baseResponse"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/baseResponse"
+  # /:
+  #   get:
+  #     tags: ["todos"]
+  #     operationId: find
+  #     parameters:
+  #       - name: limit
+  #         in: formData
+  #         type: integer
+  #         format: int32
+  #         required: true
+  #         allowEmptyValue: true
+  #       - name: "X-Rate-Limit"
+  #         in: header
+  #         type: integer
+  #         format: int32
+  #         required: true
+  #       - name: tags
+  #         in: formData
+  #         type: array
+  #         collectionFormat: multi
+  #         allowEmptyValue: true
+  #         items:
+  #           type: integer
+  #           format: int32
+  #         required: true
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         schema:
+  #           type: array
+  #           items:
+  #             $ref: "#/definitions/item"
+  #       default:
+  #         description: error
+  #         schema:
+  #           $ref: "#/definitions/error"
+  #   post:
+  #     tags: ["todos"]
+  #     operationId: addOne
+  #     parameters:
+  #       - name: body
+  #         in: body
+  #         schema:
+  #           $ref: "#/definitions/item"
+  #     responses:
+  #       "201":
+  #         description: Created
+  #         schema:
+  #           $ref: "#/definitions/item"
+  #       default:
+  #         description: error
+  #         schema:
+  #           $ref: "#/definitions/error"
+  # /{id}:
+  #   parameters:
+  #     - type: string
+  #       name: id
+  #       in: path
+  #       required: true
+  #   put:
+  #     tags: ["todos"]
+  #     operationId: updateOne
+  #     parameters:
+  #       - name: body
+  #         in: body
+  #         schema:
+  #           $ref: "#/definitions/item"
+  #     responses:
+  #       "200":
+  #         description: OK
+  #         schema:
+  #           $ref: "#/definitions/item"
+  #       default:
+  #         description: error
+  #         schema:
+  #           $ref: "#/definitions/error"
+  #   delete:
+  #     tags: ["todos"]
+  #     operationId: destroyOne
+  #     responses:
+  #       "204":
+  #         description: Deleted
+  #       default:
+  #         description: error
+  #         schema:
+  #           $ref: "#/definitions/error"
+definitions:
+  baseResponse:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
+responses:
+  ## success response
+  success:
+    description: the request to the server was successful
+    schema:
+      $ref: "#/definitions/baseResponse"
+  created:
+    description: the request to the server was successful
+    schema:
+      $ref: "#/definitions/baseResponse"
+  ## error response
+  badRequest:
+    description: something wrong when send request to server
+    schema:
+      $ref: "#/definitions/baseResponse"
+  unauthorized:
+    description: the client must be authenticated to perform this request
+    schema:
+      $ref: "#/definitions/baseResponse"
+  forbiddenAccess:
+    description: the client don`t have access to the resource
+    schema:
+      $ref: "#/definitions/baseResponse"
+  notFound:
+    description: the request resource is not found
+    schema:
+      $ref: "#/definitions/baseResponse"
+  unprocessableEntity:
+    description: The request is correct but server can`t process the request
+    schema:
+      $ref: "#/definitions/baseResponse"
+  internalServerError:
+    description: Internal Server Error
+    schema:
+      $ref: "#/definitions/baseResponse"
