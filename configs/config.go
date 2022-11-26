@@ -49,6 +49,8 @@ func NewConfig() *Config {
 	// migrate table
 	db.AutoMigrate(
 		&models.Price{},
+		&models.Account{},
+		&models.Transaction{},
 	)
 
 	app := &Config{

@@ -19,8 +19,12 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/balance"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/buyback"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/health_check"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/price"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/topup"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/transaction"
 )
 
 // NewGoldStoreDemoAPI creates a new GoldStoreDemo instance
@@ -45,11 +49,23 @@ func NewGoldStoreDemoAPI(spec *loads.Document) *GoldStoreDemoAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		BalanceGetBalanceHandler: balance.GetBalanceHandlerFunc(func(params balance.GetBalanceParams) middleware.Responder {
+			return middleware.NotImplemented("operation balance.GetBalance has not yet been implemented")
+		}),
+		TransactionGetMutationHandler: transaction.GetMutationHandlerFunc(func(params transaction.GetMutationParams) middleware.Responder {
+			return middleware.NotImplemented("operation transaction.GetMutation has not yet been implemented")
+		}),
 		PriceGetPriceHandler: price.GetPriceHandlerFunc(func(params price.GetPriceParams) middleware.Responder {
 			return middleware.NotImplemented("operation price.GetPrice has not yet been implemented")
 		}),
+		BuybackSaveBuybackHandler: buyback.SaveBuybackHandlerFunc(func(params buyback.SaveBuybackParams) middleware.Responder {
+			return middleware.NotImplemented("operation buyback.SaveBuyback has not yet been implemented")
+		}),
 		PriceSavePriceHandler: price.SavePriceHandlerFunc(func(params price.SavePriceParams) middleware.Responder {
 			return middleware.NotImplemented("operation price.SavePrice has not yet been implemented")
+		}),
+		TopupSaveTopupGoldHandler: topup.SaveTopupGoldHandlerFunc(func(params topup.SaveTopupGoldParams) middleware.Responder {
+			return middleware.NotImplemented("operation topup.SaveTopupGold has not yet been implemented")
 		}),
 		HealthCheckGetHealthCheckHandler: health_check.GetHealthCheckHandlerFunc(func(params health_check.GetHealthCheckParams) middleware.Responder {
 			return middleware.NotImplemented("operation health_check.GetHealthCheck has not yet been implemented")
@@ -90,10 +106,18 @@ type GoldStoreDemoAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// BalanceGetBalanceHandler sets the operation handler for the get balance operation
+	BalanceGetBalanceHandler balance.GetBalanceHandler
+	// TransactionGetMutationHandler sets the operation handler for the get mutation operation
+	TransactionGetMutationHandler transaction.GetMutationHandler
 	// PriceGetPriceHandler sets the operation handler for the get price operation
 	PriceGetPriceHandler price.GetPriceHandler
+	// BuybackSaveBuybackHandler sets the operation handler for the save buyback operation
+	BuybackSaveBuybackHandler buyback.SaveBuybackHandler
 	// PriceSavePriceHandler sets the operation handler for the save price operation
 	PriceSavePriceHandler price.SavePriceHandler
+	// TopupSaveTopupGoldHandler sets the operation handler for the save topup gold operation
+	TopupSaveTopupGoldHandler topup.SaveTopupGoldHandler
 	// HealthCheckGetHealthCheckHandler sets the operation handler for the get health check operation
 	HealthCheckGetHealthCheckHandler health_check.GetHealthCheckHandler
 
@@ -173,11 +197,23 @@ func (o *GoldStoreDemoAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.BalanceGetBalanceHandler == nil {
+		unregistered = append(unregistered, "balance.GetBalanceHandler")
+	}
+	if o.TransactionGetMutationHandler == nil {
+		unregistered = append(unregistered, "transaction.GetMutationHandler")
+	}
 	if o.PriceGetPriceHandler == nil {
 		unregistered = append(unregistered, "price.GetPriceHandler")
 	}
+	if o.BuybackSaveBuybackHandler == nil {
+		unregistered = append(unregistered, "buyback.SaveBuybackHandler")
+	}
 	if o.PriceSavePriceHandler == nil {
 		unregistered = append(unregistered, "price.SavePriceHandler")
+	}
+	if o.TopupSaveTopupGoldHandler == nil {
+		unregistered = append(unregistered, "topup.SaveTopupGoldHandler")
 	}
 	if o.HealthCheckGetHealthCheckHandler == nil {
 		unregistered = append(unregistered, "health_check.GetHealthCheckHandler")
@@ -273,11 +309,27 @@ func (o *GoldStoreDemoAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/balance"] = balance.NewGetBalance(o.context, o.BalanceGetBalanceHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/mutation"] = transaction.NewGetMutation(o.context, o.TransactionGetMutationHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/price"] = price.NewGetPrice(o.context, o.PriceGetPriceHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/buyback"] = buyback.NewSaveBuyback(o.context, o.BuybackSaveBuybackHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/price"] = price.NewSavePrice(o.context, o.PriceSavePriceHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/topup"] = topup.NewSaveTopupGold(o.context, o.TopupSaveTopupGoldHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

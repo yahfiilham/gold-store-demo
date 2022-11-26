@@ -85,93 +85,100 @@ paths:
           description: error
           schema:
             $ref: "#/definitions/baseResponse"
-
-  # /:
-  #   get:
-  #     tags: ["todos"]
-  #     operationId: find
-  #     parameters:
-  #       - name: limit
-  #         in: formData
-  #         type: integer
-  #         format: int32
-  #         required: true
-  #         allowEmptyValue: true
-  #       - name: "X-Rate-Limit"
-  #         in: header
-  #         type: integer
-  #         format: int32
-  #         required: true
-  #       - name: tags
-  #         in: formData
-  #         type: array
-  #         collectionFormat: multi
-  #         allowEmptyValue: true
-  #         items:
-  #           type: integer
-  #           format: int32
-  #         required: true
-  #     responses:
-  #       "200":
-  #         description: OK
-  #         schema:
-  #           type: array
-  #           items:
-  #             $ref: "#/definitions/item"
-  #       default:
-  #         description: error
-  #         schema:
-  #           $ref: "#/definitions/error"
-  #   post:
-  #     tags: ["todos"]
-  #     operationId: addOne
-  #     parameters:
-  #       - name: body
-  #         in: body
-  #         schema:
-  #           $ref: "#/definitions/item"
-  #     responses:
-  #       "201":
-  #         description: Created
-  #         schema:
-  #           $ref: "#/definitions/item"
-  #       default:
-  #         description: error
-  #         schema:
-  #           $ref: "#/definitions/error"
-  # /{id}:
-  #   parameters:
-  #     - type: string
-  #       name: id
-  #       in: path
-  #       required: true
-  #   put:
-  #     tags: ["todos"]
-  #     operationId: updateOne
-  #     parameters:
-  #       - name: body
-  #         in: body
-  #         schema:
-  #           $ref: "#/definitions/item"
-  #     responses:
-  #       "200":
-  #         description: OK
-  #         schema:
-  #           $ref: "#/definitions/item"
-  #       default:
-  #         description: error
-  #         schema:
-  #           $ref: "#/definitions/error"
-  #   delete:
-  #     tags: ["todos"]
-  #     operationId: destroyOne
-  #     responses:
-  #       "204":
-  #         description: Deleted
-  #       default:
-  #         description: error
-  #         schema:
-  #           $ref: "#/definitions/error"
+  ## Topup
+  /topup:
+    post:
+      tags:
+        - topup
+      summary: topup
+      description: api for topup
+      operationId: SaveTopupGold
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: "#/definitions/baseRequest"
+      responses:
+        "201":
+          description: success
+          schema:
+            $ref: "#/definitions/baseResponse"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/baseResponse"
+  ## Balance
+  /balance:
+    get:
+      tags:
+        - balance
+      summary: get balance
+      description: api for get balance
+      operationId: GetBalance
+      parameters:
+        - $ref: "#/parameters/accountNumber"
+      responses:
+        "200":
+          description: success
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: "#/definitions/account"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/baseResponse"
+  ## Transaction
+  /mutation:
+    get:
+      tags:
+        - transaction
+      summary: get data transaction
+      description: api for get data transaction
+      operationId: GetMutation
+      parameters:
+        - $ref: "#/parameters/accountNumber"
+        - $ref: "#/parameters/startDate"
+        - $ref: "#/parameters/endDate"
+      responses:
+        "200":
+          description: success
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/transaction"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/baseResponse"
+  ## Topup
+  /buyback:
+    post:
+      tags:
+        - buyback
+      summary: buyback
+      description: api for buyback
+      operationId: SaveBuyback
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: "#/definitions/baseRequest"
+      responses:
+        "201":
+          description: success
+          schema:
+            $ref: "#/definitions/baseResponse"
+        default:
+          description: error
+          schema:
+            $ref: "#/definitions/baseResponse"
 definitions:
   ## models
   price:
@@ -188,6 +195,39 @@ definitions:
       buybackPrice:
         type: number
         format: double
+  account:
+    allOf:
+      - $ref: "#/definitions/modelID"
+      - $ref: "#/definitions/modelLogTime"
+      - $ref: "#/definitions/accountData"
+  accountData:
+    type: object
+    properties:
+      accountNumber:
+        type: string
+      balance:
+        type: number
+        format: double
+        x-go-custom-tag: gorm:"type:decimal(10,3)"
+  transaction:
+    allOf:
+      - $ref: "#/definitions/modelID"
+      - $ref: "#/definitions/modelLogTime"
+      - $ref: "#/definitions/accountData"
+      - $ref: "#/definitions/priceData"
+      - $ref: "#/definitions/transactionData"
+  transactionData:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - topup
+          - buyback
+      gold:
+        type: number
+        format: double
+        x-go-custom-tag: gorm:"type:decimal(10,3)"
   ## common
   modelID:
     type: object
@@ -215,38 +255,30 @@ definitions:
         format: int64
       message:
         type: string
-responses:
-  ## success response
-  success:
-    description: the request to the server was successful
-    schema:
-      $ref: "#/definitions/baseResponse"
-  created:
-    description: the request to the server was successful
-    schema:
-      $ref: "#/definitions/baseResponse"
-  ## error response
-  badRequest:
-    description: something wrong when send request to server
-    schema:
-      $ref: "#/definitions/baseResponse"
-  unauthorized:
-    description: the client must be authenticated to perform this request
-    schema:
-      $ref: "#/definitions/baseResponse"
-  forbiddenAccess:
-    description: the client don`t have access to the resource
-    schema:
-      $ref: "#/definitions/baseResponse"
-  notFound:
-    description: the request resource is not found
-    schema:
-      $ref: "#/definitions/baseResponse"
-  unprocessableEntity:
-    description: The request is correct but server can`t process the request
-    schema:
-      $ref: "#/definitions/baseResponse"
-  internalServerError:
-    description: Internal Server Error
-    schema:
-      $ref: "#/definitions/baseResponse"
+  baseRequest:
+    type: object
+    properties:
+      gold:
+        type: number
+        format: double
+      price:
+        type: number
+        format: double
+      accountNumber:
+        type: string
+parameters:
+  accountNumber:
+    in: query
+    name: account_no
+    type: string
+    required: true
+  startDate:
+    in: query
+    name: start_date
+    type: integer
+    required: true
+  endDate:
+    in: query
+    name: end_date
+    type: integer
+    required: true

@@ -10,8 +10,12 @@ import (
 	httptransport "github.com/go-openapi/runtime/client"
 	"github.com/go-openapi/strfmt"
 
+	"github.com/yahfiilham/gold-store-demo/pkg/client/balance"
+	"github.com/yahfiilham/gold-store-demo/pkg/client/buyback"
 	"github.com/yahfiilham/gold-store-demo/pkg/client/health_check"
 	"github.com/yahfiilham/gold-store-demo/pkg/client/price"
+	"github.com/yahfiilham/gold-store-demo/pkg/client/topup"
+	"github.com/yahfiilham/gold-store-demo/pkg/client/transaction"
 )
 
 // Default gold store demo HTTP client.
@@ -56,8 +60,12 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *GoldStoreD
 
 	cli := new(GoldStoreDemo)
 	cli.Transport = transport
+	cli.Balance = balance.New(transport, formats)
+	cli.Buyback = buyback.New(transport, formats)
 	cli.HealthCheck = health_check.New(transport, formats)
 	cli.Price = price.New(transport, formats)
+	cli.Topup = topup.New(transport, formats)
+	cli.Transaction = transaction.New(transport, formats)
 	return cli
 }
 
@@ -102,9 +110,17 @@ func (cfg *TransportConfig) WithSchemes(schemes []string) *TransportConfig {
 
 // GoldStoreDemo is a client for gold store demo
 type GoldStoreDemo struct {
+	Balance balance.ClientService
+
+	Buyback buyback.ClientService
+
 	HealthCheck health_check.ClientService
 
 	Price price.ClientService
+
+	Topup topup.ClientService
+
+	Transaction transaction.ClientService
 
 	Transport runtime.ClientTransport
 }
@@ -112,6 +128,10 @@ type GoldStoreDemo struct {
 // SetTransport changes the transport on the client and all its subresources
 func (c *GoldStoreDemo) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
+	c.Balance.SetTransport(transport)
+	c.Buyback.SetTransport(transport)
 	c.HealthCheck.SetTransport(transport)
 	c.Price.SetTransport(transport)
+	c.Topup.SetTransport(transport)
+	c.Transaction.SetTransport(transport)
 }

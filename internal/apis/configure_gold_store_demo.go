@@ -4,6 +4,7 @@ package apis
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -12,8 +13,12 @@ import (
 
 	"github.com/yahfiilham/gold-store-demo/configs"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/balance"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/buyback"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/health_check"
 	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/price"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/topup"
+	"github.com/yahfiilham/gold-store-demo/internal/apis/operations/transaction"
 	"github.com/yahfiilham/gold-store-demo/internal/handlers"
 	"github.com/yahfiilham/gold-store-demo/pkg/models"
 )
@@ -85,6 +90,70 @@ func configureAPI(api *operations.GoldStoreDemoAPI) http.Handler {
 		}
 
 		return price.NewGetPriceOK().WithPayload(&price.GetPriceOKBody{
+			Data: data,
+		})
+	})
+
+	// topup
+	api.TopupSaveTopupGoldHandler = topup.SaveTopupGoldHandlerFunc(func(stgp topup.SaveTopupGoldParams) middleware.Responder {
+		if err := handlers.SaveTopupGold(cfg, stgp.Data); err != nil {
+			return topup.NewSaveTopupGoldDefault(http.StatusInternalServerError).WithPayload(
+				&models.BaseResponse{
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+		}
+
+		return topup.NewSaveTopupGoldCreated().WithPayload(&models.BaseResponse{
+			Code:    http.StatusCreated,
+			Message: fmt.Sprintf("success top up gold with account no %s", stgp.Data.AccountNumber),
+		})
+	})
+
+	// buyback
+	api.BuybackSaveBuybackHandler = buyback.SaveBuybackHandlerFunc(func(sbp buyback.SaveBuybackParams) middleware.Responder {
+		if err := handlers.SaveBuybackGold(cfg, sbp.Data); err != nil {
+			return buyback.NewSaveBuybackDefault(http.StatusInternalServerError).WithPayload(
+				&models.BaseResponse{
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+		}
+
+		return buyback.NewSaveBuybackCreated().WithPayload(&models.BaseResponse{
+			Code:    http.StatusCreated,
+			Message: fmt.Sprintf("success buyback gold with account no %s", sbp.Data.AccountNumber),
+		})
+	})
+
+	// balance
+	api.BalanceGetBalanceHandler = balance.GetBalanceHandlerFunc(func(gbp balance.GetBalanceParams) middleware.Responder {
+		data, err := handlers.GetAccount(cfg, gbp.AccountNo)
+		if err != nil {
+			return balance.NewGetBalanceDefault(http.StatusInternalServerError).WithPayload(
+				&models.BaseResponse{
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+		}
+
+		return balance.NewGetBalanceOK().WithPayload(&balance.GetBalanceOKBody{
+			Data: data,
+		})
+	})
+
+	// balance
+	api.TransactionGetMutationHandler = transaction.GetMutationHandlerFunc(func(gmp transaction.GetMutationParams) middleware.Responder {
+		data, err := handlers.GetMutation(cfg, gmp.AccountNo, gmp.StartDate, gmp.EndDate)
+		if err != nil {
+			return transaction.NewGetMutationDefault(http.StatusInternalServerError).WithPayload(
+				&models.BaseResponse{
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+		}
+
+		return transaction.NewGetMutationOK().WithPayload(&transaction.GetMutationOKBody{
 			Data: data,
 		})
 	})
